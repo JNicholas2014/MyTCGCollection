@@ -1,0 +1,6 @@
+﻿Special thanks to the following for their contributions:
+
+Photo by Los Muertos Crew from Pexels -- home_image.jpg
+Pokellector.com -- data used to build the cards and games tables within my TCGCollection database
+Jan Kallman -- author of EPPlus 
+
