@@ -12,6 +12,7 @@ using MyTCGCollection.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System.Security;
+using Microsoft.AspNetCore.Identity;
 
 namespace MyTCGCollection.Controllers
 {
@@ -20,11 +21,15 @@ namespace MyTCGCollection.Controllers
     public class SeedController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _env;
 
-        public SeedController(ApplicationDbContext context, IWebHostEnvironment env)
+        public SeedController(ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
         {
             _context = context;
+            _roleManager = roleManager;
+            _userManager = userManager;
             _env = env;
         }
 
@@ -117,6 +122,71 @@ namespace MyTCGCollection.Controllers
                 await _context.SaveChangesAsync();
 
             return new JsonResult(new { Cards = numberOfCardsAdded, Games = numberOfGamesAdded });
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> CreateDefaultUsers() 
+        {
+            string role_RegisteredUser = "RegisteredUser";
+            string role_Administrator = "Administrator";
+
+            if (await _roleManager.FindByNameAsync(role_RegisteredUser) == null)
+                await _roleManager.CreateAsync(new IdentityRole(role_RegisteredUser));
+
+            if (await _roleManager.FindByNameAsync(role_Administrator) == null)
+                await _roleManager.CreateAsync(new IdentityRole(role_Administrator));
+
+            var addedUsersList = new List<ApplicationUser>();
+
+            var email_Admin = "admin@email.com";
+            if(await _userManager.FindByNameAsync(email_Admin) == null)
+            {
+                var user_Admin = new ApplicationUser()
+                {
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = email_Admin,
+                    Email = email_Admin,
+                };
+
+                await _userManager.CreateAsync(user_Admin, "MySecr3t$");
+
+                await _userManager.AddToRoleAsync(user_Admin, role_RegisteredUser);
+                await _userManager.AddToRoleAsync(user_Admin, role_Administrator);
+
+                user_Admin.EmailConfirmed = true;
+                user_Admin.LockoutEnabled = false;
+
+                addedUsersList.Add(user_Admin);
+            }
+
+            var email_User = "user@email.com";
+            if(await _userManager.FindByNameAsync(email_User) == null)
+            {
+                var user_User = new ApplicationUser()
+                {
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = email_User,
+                    Email = email_User
+                };
+
+                await _userManager.CreateAsync(user_User, "MySecr3t$");
+
+                await _userManager.AddToRoleAsync(user_User, role_RegisteredUser);
+
+                user_User.EmailConfirmed = true;
+                user_User.LockoutEnabled = false;
+
+                addedUsersList.Add(user_User);
+            }
+
+            if (addedUsersList.Count > 0)
+                await _context.SaveChangesAsync();
+
+            return new JsonResult(new
+            {
+                Count = addedUsersList.Count,
+                Users = addedUsersList
+            });
         }
     }
 }

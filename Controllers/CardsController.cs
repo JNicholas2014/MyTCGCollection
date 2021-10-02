@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,7 @@ namespace MyTCGCollection.Controllers
 
         // PUT: api/Cards/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCard(int id, Card card)
         {
@@ -75,6 +77,7 @@ namespace MyTCGCollection.Controllers
 
         // POST: api/Cards
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Card>> PostCard(Card card)
         {
@@ -85,6 +88,7 @@ namespace MyTCGCollection.Controllers
         }
 
         // DELETE: api/Cards/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCard(int id)
         {

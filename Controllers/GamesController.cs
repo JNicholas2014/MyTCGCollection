@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyTCGCollection.Data;
 using MyTCGCollection.Data.Models;
-
+using Microsoft.AspNetCore.Authorization;
 namespace MyTCGCollection.Controllers
 {
     [Route("api/[controller]")]
@@ -44,6 +44,7 @@ namespace MyTCGCollection.Controllers
 
         // PUT: api/Games/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGame(int id, Game game)
         {
@@ -75,6 +76,7 @@ namespace MyTCGCollection.Controllers
 
         // POST: api/Games
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Game>> PostGame(Game game)
         {
@@ -85,6 +87,7 @@ namespace MyTCGCollection.Controllers
         }
 
         // DELETE: api/Games/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGame(int id)
         {
